@@ -1,15 +1,17 @@
 import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
+import {withRouter} from 'react-router-dom';
+
 
 import './pokemon-detail.component.scss';
 import { PokemonCard } from '../../component';
 import { GET_POKEMON_DETAIL } from '../../shared/model';
 
-export function PokemonDetail(props) {
+export const PokemonDetail = withRouter((props) => {
     const { data, loading } = useQuery(
         GET_POKEMON_DETAIL,
         { variables: { id: props.match.params.id }, notifyOnNetworkStatusChange: true }
-    );
+        );
 
     const mapDataToList = (dataItems) => {
         return (
@@ -90,4 +92,4 @@ export function PokemonDetail(props) {
             )}
         </>
     );
-}
+});
