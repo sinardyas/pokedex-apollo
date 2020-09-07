@@ -10,7 +10,7 @@ export const Header = withRouter((props) => {
     return (
         <div className="header">
             <Link to="/">
-                Home
+                Pokédex
             </Link>
             {props.location.pathname === '/' && (<Dropdown />)}
         </div>
