@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from 'react';
 
-import { useQuery, gql } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/react-hooks';
 import { Waypoint } from "react-waypoint";
-// import gql from "graphql-tag";
+import { useSelector } from 'react-redux';
+
 
 import './pokemon-list.component.scss';
+import { PokemonCard } from '../../component'
+import { GET_POKEMON_LIST } from '../../shared/model';
 
-const GET_POKEMON_INFO = gql`
-   query Pokemon($first: Int!) {
-        pokemons(first: $first) {
-            id
-            name,
-            image
-        }
-    }
-`;
-
-export function PokemonList() {
+export function PokemonList(props) {
+    const filterType = useSelector(state => state.filter.filterType);
     const [pageSize, setPageSize] = useState(15);
     const [isBottom, setIsBottom] = useState(false);
-    const [temp, setTemp] = useState(false);
+    const [pokemons, setPokemons] = useState([]);
     
-    const { data, fetchMore } = useQuery(
-        GET_POKEMON_INFO,
-        { variables: { first: 15 }}
+    const { data, loading, fetchMore } = useQuery(
+        GET_POKEMON_LIST,
+        { variables: { first: 15 }, notifyOnNetworkStatusChange: true }
     );
 
     useEffect(() => {
+        console.log('temp')
         window.addEventListener('scroll', onScroll);
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
+    useEffect(() => {
+        if (data && data.pokemons.length > 0) {
+            if (filterType) {
+                const filteredData = data.pokemons && data.pokemons.filter(item => item.types.includes(filterType));
+                setPokemons(filteredData);
+            } else {
+                setPokemons(data.pokemons);
+            }
+        }
+    }, [filterType, data]);
 
     const onScroll = () => {
         const scrollTop = (document.documentElement
@@ -39,8 +45,7 @@ export function PokemonList() {
             && document.documentElement.scrollHeight)
             || document.body.scrollHeight;
           if (scrollTop + window.innerHeight >= scrollHeight) {
-              console.log('herehrhehr')
-            setIsBottom(true);
+              setIsBottom(true);
           }
     }
 
@@ -60,38 +65,23 @@ export function PokemonList() {
                 }
             }
         });
-  
-    }
-
-    const onClick = () => {
-        console.log(temp);
-        setTemp(true);
     }
 
     return (
         <>
             <div className="container">
-                {
-                    data && data.pokemons && data.pokemons.map(pokemon => (
-                        <React.Fragment key={pokemon.id}>
-                            <div className="item" onClick={onClick}>
-                                <img src={pokemon.image} className="item-img" alt=""/>
-                                <div className="item-name">
-                                    {pokemon.name}
-                                </div>
-                            </div>
-                        </React.Fragment>
-                    ))
-                }
-                {
-                    isBottom && (pageSize <= 150) && (
-                        <Waypoint onEnter={onFetchMoreData} />
-                    )
-                }
+                {pokemons && pokemons.map((pokemon, i) => (
+                    <PokemonCard data={pokemon} key={i}/>
+                ))}
+                {isBottom && (pageSize <= 150) && (
+                    <Waypoint onEnter={onFetchMoreData} />
+                )}
             </div>
-            <div className="container">
-                <p>Loading...</p>
-            </div>
+            {loading && (
+                <div className="container">
+                    <p>Loading....</p>
+                </div>
+            )}
         </>
     )
 }

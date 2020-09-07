@@ -1,0 +1,33 @@
+.card {
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    margin: 24px;
+    width: 300px;
+    transition: 0.1s ease-out;
+
+    &:hover {
+        cursor: pointer;
+        opacity: 0.7;
+    }
+    
+    .card-img {
+        height: auto;
+        flex: 1;
+        width: 80%;
+        margin: 48px 0;
+        object-fit: contain;
+    }
+    
+    .card-name {
+        box-sizing: border-box;
+        background-color: #000; 
+        color: #fff; 
+        font-size: 20px; 
+        padding: 16px 24px; 
+        width: 100%;
+        text-align: center;
+    }
+}
